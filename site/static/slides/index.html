@@ -304,7 +304,7 @@ xml_find_all(nodes, "//head")
 
 ```
 #&gt; {xml_nodeset (1)}
-#&gt; [1] &lt;head&gt;\n&lt;meta http-equiv="Content-Type" content="text/html; charset= ...
+#&gt; [1] &lt;head&gt;\n&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8 ...
 ```
 
 ```r
@@ -358,7 +358,7 @@ xml_siblings(heads)
 
 ```
 #&gt; {xml_nodeset (1)}
-#&gt; [1] &lt;body&gt;\n    &lt;h1&gt;Título Grande&lt;/h1&gt;\n    \n    &lt;h2&gt;Título um pouco me ...
+#&gt; [1] &lt;body&gt;\n    &lt;h1&gt;Título Grande&lt;/h1&gt;\n    \n    &lt;h2&gt;Título um pouco menor&lt;/ ...
 ```
 
 ```r
@@ -435,7 +435,7 @@ xml_find_all(html, "//p")
 #&gt; {xml_nodeset (3)}
 #&gt; [1] &lt;p&gt;Sou um parágrafo normal.&lt;/p&gt;
 #&gt; [2] &lt;p class="azul"&gt;Sou um parágrafo azul.&lt;/p&gt;
-#&gt; [3] &lt;p id="meu-p-favorito" class="azul"&gt;Sou um parágrafo azul e negrito. ...
+#&gt; [3] &lt;p id="meu-p-favorito" class="azul"&gt;Sou um parágrafo azul e negrito.&lt;/p&gt;
 ```
 
 ```r
@@ -445,7 +445,7 @@ xml_find_all(html, "//*[@class='azul']")
 ```
 #&gt; {xml_nodeset (2)}
 #&gt; [1] &lt;p class="azul"&gt;Sou um parágrafo azul.&lt;/p&gt;
-#&gt; [2] &lt;p id="meu-p-favorito" class="azul"&gt;Sou um parágrafo azul e negrito. ...
+#&gt; [2] &lt;p id="meu-p-favorito" class="azul"&gt;Sou um parágrafo azul e negrito.&lt;/p&gt;
 ```
 
 ---
@@ -459,7 +459,7 @@ rvest::html_nodes(html, ".azul")
 ```
 #&gt; {xml_nodeset (2)}
 #&gt; [1] &lt;p class="azul"&gt;Sou um parágrafo azul.&lt;/p&gt;
-#&gt; [2] &lt;p id="meu-p-favorito" class="azul"&gt;Sou um parágrafo azul e negrito. ...
+#&gt; [2] &lt;p id="meu-p-favorito" class="azul"&gt;Sou um parágrafo azul e negrito.&lt;/p&gt;
 ```
 
 Note que `//p` indica que estamos fazendo uma busca na tag `p`, enquanto `//*`
@@ -629,8 +629,7 @@ get_2$cookies
 ```
 
 ```
-#&gt; [1] domain     flag       path       secure     expiration name      
-#&gt; [7] value     
+#&gt; [1] domain     flag       path       secure     expiration name       value     
 #&gt; &lt;0 rows&gt; (or 0-length row.names)
 ```
 
@@ -665,7 +664,7 @@ read_html(post_1)
 ```
 #&gt; {html_document}
 #&gt; &lt;html&gt;
-#&gt; [1] &lt;body&gt;&lt;p&gt;{\n  "args": {}, \n  "data": "", \n  "files": {}, \n  "form ...
+#&gt; [1] &lt;body&gt;&lt;p&gt;{\n  "args": {}, \n  "data": "", \n  "files": {}, \n  "form": {} ...
 ```
 
 ```r
@@ -675,7 +674,7 @@ read_html(post_2)
 ```
 #&gt; {html_document}
 #&gt; &lt;html&gt;
-#&gt; [1] &lt;body&gt;&lt;p&gt;{\n  "args": {}, \n  "data": "", \n  "files": {}, \n  "form ...
+#&gt; [1] &lt;body&gt;&lt;p&gt;{\n  "args": {}, \n  "data": "", \n  "files": {}, \n  "form": {\ ...
 ```
 
 ???
@@ -700,7 +699,7 @@ read_html("static/post.html")
 ```
 #&gt; {html_document}
 #&gt; &lt;html&gt;
-#&gt; [1] &lt;body&gt;&lt;p&gt;{\n  "args": {}, \n  "data": "", \n  "files": {}, \n  "form ...
+#&gt; [1] &lt;body&gt;&lt;p&gt;{\n  "args": {}, \n  "data": "", \n  "files": {}, \n  "form": {\ ...
 ```
 
 Clicando duas vezes no arquivo ou rodando a função `BROWSE()` abrimos ele em
@@ -889,19 +888,6 @@ preg
 #&gt; 3        Pedro          6          7
 ```
 
---
-
-
-```r
-d &lt;- tibble(
-  a = 1:3,
-  b = letters[1:3],
-  c = list(mtcars, iris, cars)
-)
-```
-
----
-
 ## Jeito 2
 
 
@@ -1038,7 +1024,7 @@ Mas também existem outros cuidados que você pode ter na hora de repetir uma re
 
 2. Deixe tudo o mais `tidy` o possível.
 
-3. Use a função `abjutils::pvec`.
+3. Use a função `furrr::future_map`.
 
 ---
 # Iteração - Básico
@@ -1073,7 +1059,7 @@ do loop, vamos estar pegando uma página do índice do site.
 
 ---
 
-# pvec
+# furrr
 
 Web scraping é difícil porque, lá no fundo, estamos fazendo uma engenharia reversa...
 
@@ -1087,27 +1073,29 @@ Para remediar isso, criamos uma função que faz três coisas:
 
 1. Itera o mesmo resultado várias vezes (vetoriza)
 
-2. Não trava a função se der erro
+2. Exibe progresso
 
 3. Paraleliza
 
 ---
 
-# pvec (cont.)
+# furrr (cont.)
 
 
 ```r
-lista &lt;- list("a", 2, -1)
-abjutils::pvec(lista, log, .cores = 2)
+lista &lt;- list(3, 2, -1)
+furrr::future_map(lista, log)
 ```
 
 ```
-#&gt; # A tibble: 3 x 3
-#&gt;      id return output      
-#&gt;   &lt;int&gt; &lt;chr&gt;  &lt;named list&gt;
-#&gt; 1     1 result &lt;NULL&gt;      
-#&gt; 2     2 result &lt;dbl [1]&gt;   
-#&gt; 3     3 result &lt;dbl [1]&gt;
+#&gt; [[1]]
+#&gt; [1] 1.098612
+#&gt; 
+#&gt; [[2]]
+#&gt; [1] 0.6931472
+#&gt; 
+#&gt; [[3]]
+#&gt; [1] NaN
 ```
 
 ---
@@ -1334,11 +1322,7 @@ pag_signup %&gt;%
 ```
 
 ```
-#&gt; First use of Tesseract: copying language data...
-```
-
-```
-#&gt; [1] "* science -\n"
+#&gt; [1] ". Interest\n"
 ```
 
 Muitas vezes pode ser necessário tratar ainda mais a imagem antes de passar o OCR.
@@ -1416,7 +1400,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {
