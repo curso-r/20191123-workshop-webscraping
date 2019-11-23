@@ -765,20 +765,6 @@ preg
 #> 3        Pedro          6          7
 ```
 
---
-
-```{r}
-
-d <- tibble(
-  a = 1:3,
-  b = letters[1:3],
-  c = list(mtcars, iris, cars)
-)
-
-```
-
----
-
 ## Jeito 2
 
 ```{r, eval = FALSE}
@@ -906,7 +892,7 @@ Mas também existem outros cuidados que você pode ter na hora de repetir uma re
 
 2. Deixe tudo o mais `tidy` o possível.
 
-3. Use a função `abjutils::pvec`.
+3. Use a função `furrr::future_map`.
 
 ---
 # Iteração - Básico
@@ -942,7 +928,7 @@ do loop, vamos estar pegando uma página do índice do site.
 
 ---
 
-# pvec
+# furrr
 
 Web scraping é difícil porque, lá no fundo, estamos fazendo uma engenharia reversa...
 
@@ -956,17 +942,17 @@ Para remediar isso, criamos uma função que faz três coisas:
 
 1. Itera o mesmo resultado várias vezes (vetoriza)
 
-2. Não trava a função se der erro
+2. Exibe progresso
 
 3. Paraleliza
 
 ---
 
-# pvec (cont.)
+# furrr (cont.)
 
 ```{r, erro = FALSE, warning=FALSE, message = FALSE}
-lista <- list("a", 2, -1)
-abjutils::pvec(lista, log, .cores = 2)
+lista <- list(3, 2, -1)
+furrr::future_map(lista, log)
 ```
 
 ---
