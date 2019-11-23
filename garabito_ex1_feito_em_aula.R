@@ -28,6 +28,7 @@ xml_children(divs_filhos_de_td)
 
 # opcao 3: encurtar ao máximo a query
 tags_a <- xml_find_all(html, "//td//a")
+tags_img <- xml_find_all(html, "//td//a/img")
 
 # quarto passo: extrair dos nós que eu tenho interesse as informações relevantes
 
@@ -37,13 +38,20 @@ links <- unlist(xml_attrs(tags_a))
 
 links <- xml_attr(tags_a, "href")
 
+links_completo <- paste0("http://example.webscraping.com", links)
+
 # passo 4.2: pegar os textos
 
 textos <- xml_text(tags_a)
 
+# passo 4.3: pegar os src das imagens
+
+imagens <- xml_attr(tags_img, "src")
+
 # quinto passo: montar o data.frame
 
 data.frame(
-  coluna_link = links,
-  coluna_nome_pais = textos
+  coluna_link = links_completo,
+  coluna_nome_pais = textos,
+  coluna_imagens = imagens
 )
